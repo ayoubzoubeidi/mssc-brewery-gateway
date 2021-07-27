@@ -6,28 +6,27 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-@Profile("!local-discovery")
+@Profile("local-discovery")
 @Configuration
-public class LocalHostRouteConfig {
+public class LocalDiscoveryRouteConfig {
 
     @Bean
-    public RouteLocator localHostRouteLocator(RouteLocatorBuilder builder) {
+    public RouteLocator localDiscoveryRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
 
                 //Beer Service Route
                 .route(r -> r.path("/api/v1/beer*", "/api/v1/beer/upc*", "/api/v1/beer/upc/*")
-                        .uri("http://localhost:8080"))
+                        .uri("lb://beer-service"))
 
                 //Beer Order Service Route
                 .route(r -> r.path("/api/v1/customers/**")
-                        .uri("http://localhost:8081"))
+                        .uri("lb://order-service"))
 
                 // Beer Inventory Service Route
 
                 .route(r -> r.path("api/v1/beer/*/inventory")
-                        .uri("http://localhost:8082"))
+                        .uri("lb://inventory-service"))
                 .build();
     }
-
 
 }
