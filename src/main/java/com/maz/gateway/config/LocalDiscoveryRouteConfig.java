@@ -24,8 +24,16 @@ public class LocalDiscoveryRouteConfig {
 
                 // Beer Inventory Service Route
 
-                .route(r -> r.path("api/v1/beer/*/inventory")
+                .route(r -> r.path("/api/v1/beer/*/inventory")
+                        .filters(f ->
+                                f.circuitBreaker(cb -> cb.setName("inventoryCircuitBreaker")
+                                .setFallbackUri("forward:/inventory-failover")
+                                .setRouteId("inventory-failover")))
                         .uri("lb://inventory-service"))
+
+                // Inventory FailOver Route
+                .route(r -> r.path("/inventory-failover/**")
+                        .uri("lb://inventory-failover-service"))
                 .build();
     }
 
